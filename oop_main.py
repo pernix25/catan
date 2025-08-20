@@ -17,9 +17,6 @@ def main():
     white = (255,255,255)
     black = (0,0,0)
 
-    # display blue background
-    SCREEN.fill(blue)
-
     menu_font = pygame.font.SysFont(None, 24)
     menu_buttons = [
         {"label": "Draw Triangle", "rect": pygame.Rect(10, HEIGHT-60, 120, 40), "action": "triangle"},
@@ -92,12 +89,15 @@ def main():
                     camera_y -= dy
                     last_mouse_pos = (mx, my)
 
-        # draws the board
-        board.print_board(SCREEN)
-
         # Clamp camera so you can't scroll too far
         camera_x = max(min(camera_x, max_x + BUFFER - WIDTH//2), min_x - BUFFER + WIDTH//2)
         camera_y = max(min(camera_y, max_y + BUFFER - HEIGHT//2), min_y - BUFFER + HEIGHT//2)
+
+        # display blue background
+        SCREEN.fill(blue)
+
+        # draws the board
+        board.print_board(SCREEN, camera_x, camera_y)
     
         pygame.display.flip() # updates display
 

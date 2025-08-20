@@ -34,17 +34,21 @@ class Tile:
         self.number = number
         self.vertices = vertices
     
-    def print_tile(self, window):
-        pygame.draw.polygon(window, self.resource, self.vertices) # fill hexagon with white
-        pygame.draw.polygon(window, black, self.vertices, 5) # outline hexagon with black
+    def print_tile(self, window, camera_x, camera_y):
+        cx,cy = self.center
+        draw_x = cx - camera_x + WIDTH//2
+        draw_y = cy - camera_y + HEIGHT//2
+        hexagon = hexagon_points((draw_x, draw_y), hex_size)
+        pygame.draw.polygon(window, self.resource, hexagon) # fill hexagon with white
+        pygame.draw.polygon(window, black, hexagon, 5) # outline hexagon with black
 
         if self.number != 0:
             # draw circle
-                pygame.draw.circle(window, white, self.center, hex_size // 3)
+                pygame.draw.circle(window, white, (int(draw_x), int(draw_y)), hex_size // 3)
 
                 # draw number centered on circle
                 text = board_font.render(str(self.number), True, black)
-                text_rect = text.get_rect(center=self.center)
+                text_rect = text.get_rect(center=(draw_x, draw_y))
                 window.blit(text, text_rect)
 
 class Board:
@@ -110,11 +114,11 @@ class Board:
     def clear_structures(self):
         self.structures = []
 
-    def print_board(self, window):
+    def print_board(self, window, camera_x, camera_y):
         for tile in self.tiles:
-            tile.print_tile(window)
+            tile.print_tile(window, camera_x, camera_y)
         for structure in self.structures:
-            structure.print(window)
+            structure.print(window, camera_x, camera_y)
 
 def main():
     hex_centers = hexagon_grid((WIDTH//2, HEIGHT//2), hex_size, rings=2)
