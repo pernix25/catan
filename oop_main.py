@@ -16,6 +16,7 @@ def main():
     blue = (0,0,255)
     white = (255,255,255)
     black = (0,0,0)
+    red = (255,0,0)
 
     menu_font = pygame.font.SysFont(None, 24)
     menu_buttons = [
@@ -50,7 +51,7 @@ def main():
                 if current_action == "triangle":
                     world_x = mouse_pos[0] + camera_x - WIDTH//2
                     world_y = mouse_pos[1] + camera_y - HEIGHT//2
-                    board.add_structure() # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    board.add_structure(Settlement((world_x, world_y), red))
                 current_action = None
 
             # checks if menu is clicked if not drag screen around
@@ -98,6 +99,16 @@ def main():
 
         # draws the board
         board.print_board(SCREEN, camera_x, camera_y)
+
+        # draws menu
+        for button in menu_buttons:
+            pygame.draw.rect(SCREEN, (200, 200, 200), button["rect"])  # light gray background
+            pygame.draw.rect(SCREEN, black, button["rect"], 2)     # black border
+            
+            # Draw text centered
+            text = menu_font.render(button["label"], True, black)
+            text_rect = text.get_rect(center=button["rect"].center)
+            SCREEN.blit(text, text_rect)
     
         pygame.display.flip() # updates display
 

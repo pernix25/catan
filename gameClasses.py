@@ -16,6 +16,12 @@ class Settlement:
     def __init__(self, pos, color):
         self.pos = pos
         self.color = color
+    
+    def print_structure(self, window, camera_x, camera_y):
+        cx,cy = self.pos
+        draw_x = cx - camera_x + WIDTH//2
+        draw_y = cy - camera_y + HEIGHT//2
+        draw_triangle(window, (draw_x, draw_y), 30, self.color) # 30 = size
 
 class City:
     def __init__(self, pos, color):
@@ -108,8 +114,8 @@ class Board:
             self.tiles.append(Tile(c, color, number, vertices))
             find_hexagon_midpoints(self.midpoints)
 
-    def add_structure(self, structure):
-        pass
+    def add_structure(self, structure) -> None:
+        self.structures.append(structure)
 
     def clear_structures(self):
         self.structures = []
@@ -118,7 +124,7 @@ class Board:
         for tile in self.tiles:
             tile.print_tile(window, camera_x, camera_y)
         for structure in self.structures:
-            structure.print(window, camera_x, camera_y)
+            structure.print_structure(window, camera_x, camera_y)
 
 def main():
     hex_centers = hexagon_grid((WIDTH//2, HEIGHT//2), hex_size, rings=2)
