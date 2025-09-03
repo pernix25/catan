@@ -119,6 +119,20 @@ class Board:
 
     def clear_structures(self):
         self.structures = []
+    
+    def find_closest_vert(self, point):
+        nearest_vert = None
+        min_distance = float("inf")
+        px,py = point
+
+        for vert in self.vertices:
+            vx,vy = vert
+            dist = ((px - vx)**2 + (py - vy)**2) ** 0.5  # Euclidean distance
+            if dist < min_distance:
+                min_distance = dist
+                nearest_vert = (vx, vy)
+        
+        return nearest_vert
 
     def print_board(self, window, camera_x, camera_y):
         for tile in self.tiles:

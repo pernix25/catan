@@ -51,7 +51,8 @@ def main():
                 if current_action == "triangle":
                     world_x = mouse_pos[0] + camera_x - WIDTH//2
                     world_y = mouse_pos[1] + camera_y - HEIGHT//2
-                    board.add_structure(Settlement((world_x, world_y), red))
+                    nearest_vert = board.find_closest_vert((world_x, world_y))
+                    board.add_structure(Settlement(nearest_vert, red))
                 current_action = None
 
             # checks if menu is clicked if not drag screen around
