@@ -20,8 +20,10 @@ def main():
 
     menu_font = pygame.font.SysFont(None, 24)
     menu_buttons = [
-        {"label": "Draw Triangle", "rect": pygame.Rect(10, HEIGHT-60, 120, 40), "action": "triangle"},
-        {"label": "Clear", "rect": pygame.Rect(140, HEIGHT-60, 80, 40), "action": "clear"}
+        {"label": "Place Settlement", "rect": pygame.Rect(10, HEIGHT-50, 150, 40), "action": "settlement"},
+        {"label": "Clear", "rect": pygame.Rect(170, HEIGHT-50, 110, 40), "action": "clear"},
+        {"label": "Place City", "rect": pygame.Rect(10, HEIGHT-100, 150, 40), "action": "city"},
+        {"label": "Place Road", "rect": pygame.Rect(170, HEIGHT-100, 110, 40), "action": "road"}
     ]
 
     # camera
@@ -48,11 +50,21 @@ def main():
             # preforms action on mouse click
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and current_action:
                 mouse_pos = event.pos
-                if current_action == "triangle":
+                if current_action == "settlement":
                     world_x = mouse_pos[0] + camera_x - WIDTH//2
                     world_y = mouse_pos[1] + camera_y - HEIGHT//2
                     nearest_vert = board.find_closest_vert((world_x, world_y))
                     board.add_structure(Settlement(nearest_vert, red))
+                elif current_action == "city":
+                    world_x = mouse_pos[0] + camera_x - WIDTH//2
+                    world_y = mouse_pos[1] + camera_y - HEIGHT//2
+                    nearest_vert = board.find_closest_vert((world_x, world_y))
+                    board.add_structure(City(nearest_vert, blue))
+                elif current_action == "road":
+                    world_x = mouse_pos[0] + camera_x - WIDTH//2
+                    world_y = mouse_pos[1] + camera_y - HEIGHT//2
+                    nearest_mid = board.find_closest_midpoint((world_x, world_y))
+                    board.add_structure(Road(nearest_mid, white))
                 current_action = None
 
             # checks if menu is clicked if not drag screen around

@@ -28,10 +28,22 @@ class City:
         self.pos = pos
         self.color = color
 
+    def print_structure(self, window, camera_x, camera_y):
+        cx,cy = self.pos
+        draw_x = cx - camera_x + WIDTH//2
+        draw_y = cy - camera_y + HEIGHT//2
+        draw_triangle(window, (draw_x, draw_y), 30, self.color) # 30 = size
+
 class Road:
     def __init__(self, pos, color):
         self.pos = pos
         self.color = color
+
+    def print_structure(self, window, camera_x, camera_y):
+        cx,cy = self.pos
+        draw_x = cx - camera_x + WIDTH//2
+        draw_y = cy - camera_y + HEIGHT//2
+        draw_triangle(window, (draw_x, draw_y), 30, self.color) # 30 = size
 
 class Tile:
     def __init__(self, center, resource, number, vertices) -> None:
@@ -62,7 +74,7 @@ class Board:
         self.reset()
 
     def reset(self, num_players=4) -> None:
-        def find_hexagon_verticies(center, size, points) -> None:
+        def find_hexagon_verticies(center, size) -> None:
             """Return the 6 vertices of a pointy-topped hexagon."""
             cx, cy = center
             verts = []
@@ -72,17 +84,16 @@ class Board:
                 y = cy + size * math.sin(angle)
                 verts.append((x, y))
 
-            points += verts
+            find_hexagon_midpoints(verts)
+            self.vertices += verts
             return verts
-        def find_hexagon_midpoints(points):
-            vertices = self.vertices
-
+        def find_hexagon_midpoints(verts):
             # Add midpoints of each side
             for i in range(6):
-                x1, y1 = vertices[i]
-                x2, y2 = vertices[(i+1) % 6]  # next vertex (wrap around)
+                x1, y1 = verts[i]
+                x2, y2 = verts[(i+1) % 6]  # next vertex (wrap around)
                 midpoint = ((x1 + x2)/2, (y1 + y2)/2)
-                points.append(midpoint)
+                self.midpoints.append(midpoint)
 
         self.centers = []
         self.structures = []
@@ -110,9 +121,8 @@ class Board:
             else:
                 number = resource_numbers.pop()
 
-            vertices = find_hexagon_verticies(c, hex_size, self.vertices)
+            vertices = find_hexagon_verticies(c, hex_size)
             self.tiles.append(Tile(c, color, number, vertices))
-            find_hexagon_midpoints(self.midpoints)
 
     def add_structure(self, structure) -> None:
         self.structures.append(structure)
@@ -133,6 +143,20 @@ class Board:
                 nearest_vert = (vx, vy)
         
         return nearest_vert
+    
+    def find_closest_midpoint(self, point):
+        nearest_mid = None
+        min_distance = float("inf")
+        px,py = point
+
+        for mid in self.midpoints:
+            mx,my = mid
+            dist = ((px - mx)**2 + (py - my)**2) ** 0.5  # Euclidean distance
+            if dist < min_distance:
+                min_distance = dist
+                nearest_mid = (mx,my)
+        
+        return nearest_mid
 
     def print_board(self, window, camera_x, camera_y):
         for tile in self.tiles:
