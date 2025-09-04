@@ -1,6 +1,7 @@
 from utils import *
 import random
 import pygame
+import math
 
 HEIGHT = 640
 WIDTH = 960
@@ -35,15 +36,16 @@ class City:
         draw_triangle(window, (draw_x, draw_y), 30, self.color) # 30 = size
 
 class Road:
-    def __init__(self, pos, color):
+    def __init__(self, pos, color, angle):
         self.pos = pos
         self.color = color
+        self.angle = angle
 
     def print_structure(self, window, camera_x, camera_y):
         cx,cy = self.pos
         draw_x = cx - camera_x + WIDTH//2
         draw_y = cy - camera_y + HEIGHT//2
-        draw_triangle(window, (draw_x, draw_y), 30, self.color) # 30 = size
+        draw_rotated_rectangle(window, (draw_x, draw_y), self.angle, self.color)
 
 class Tile:
     def __init__(self, center, resource, number, vertices) -> None:
@@ -74,6 +76,30 @@ class Board:
         self.reset()
 
     def reset(self, num_players=4) -> None:
+        def find_angle_between_points(p1, p2):
+            # finds the angle between 2 pionts in degrees
+            x1,y1 = p1
+            x2,y2 = p2
+
+            dx = x2 - x1
+            dy = y2 - y1
+
+            angle_radians = math.atan2(dy, dx)
+            angle_degrees = math.degrees(angle_radians) + 90 # rotates angle 90 degrees
+
+            return angle_degrees
+        def find_hexagon_midpoints(verts):
+            # Add midpoints of each side 
+            for i in range(6):
+                v1 = verts[i]
+                v2 = verts[(i+1) % 6]  # next vertex (wrap around)
+                x1, y1 = v1
+                x2, y2 = v2
+                midpoint = ((x1 + x2)/2, (y1 + y2)/2)
+                angle = find_angle_between_points(v1,v2)
+                self.midpoints.append(midpoint)
+                self.road_angles[midpoint] = angle
+        
         def find_hexagon_verticies(center, size) -> None:
             """Return the 6 vertices of a pointy-topped hexagon."""
             cx, cy = center
@@ -87,19 +113,13 @@ class Board:
             find_hexagon_midpoints(verts)
             self.vertices += verts
             return verts
-        def find_hexagon_midpoints(verts):
-            # Add midpoints of each side
-            for i in range(6):
-                x1, y1 = verts[i]
-                x2, y2 = verts[(i+1) % 6]  # next vertex (wrap around)
-                midpoint = ((x1 + x2)/2, (y1 + y2)/2)
-                self.midpoints.append(midpoint)
 
         self.centers = []
         self.structures = []
         self.tiles = []
         self.vertices = []
         self.midpoints = []
+        self.road_angles = {}
         resource_numbers = [11,3,6,5,4,9,10,8,4,11,12,9,10,8,3,6,2,5]
         resources_ratios = [4,4,3,3,4,1] # wood, wheat, brick, stone, sheep, desert
         tile_colors = [(10,105,14), (237,234,40),(201,69,28),(133,144,153),(71,222,76),(194, 178, 128)] # wood, wheat, brick, stone, sheep, desert
